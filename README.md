@@ -1,1 +1,0 @@
-# Sportlink_terraform_k8s
