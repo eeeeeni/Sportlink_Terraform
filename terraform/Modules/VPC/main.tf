@@ -1,5 +1,6 @@
 module "vpc" {
-  source = "github.com/eeeeeni/Terraform-project-VPC"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.9.0"
 
   name = var.name
   cidr = var.cidr
@@ -7,42 +8,32 @@ module "vpc" {
   azs             = var.availability_zones
   private_subnets = var.private_subnet_cidr_blocks
   public_subnets  = var.public_subnet_cidr_blocks
+  # database_subnets = var.database_subnet_cidr_blocks
 
-  tags = var.tags
-}
+  enable_dns_hostnames = true
+  enable_dns_support = true
 
-# Internet Gateway
-resource "aws_internet_gateway" "this" {
-  vpc_id = module.vpc.vpc_id
-  tags   = var.tags
-}
+  # enable_nat_gateway = var.enable_nat_gateway
+  # single_nat_gateway = var.single_nat_gateway
+  # one_nat_gateway_per_az = var.one_nat_gateway_per_az
 
-# Public Route Table
-resource "aws_route_table" "public" {
-  vpc_id = module.vpc.vpc_id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this.id
+  tags = merge(var.tags, {
+    "Name" = "${var.name}-vpc"
+  })
+
+  public_subnet_tags = {
+    Name = "${var.name}-public-subnet"
   }
-  tags = var.tags
-}
 
-# Associate public subnets with the public route table
-resource "aws_route_table_association" "public" {
-  count          = length(module.vpc.public_subnets)
-  subnet_id      = element(module.vpc.public_subnets, count.index)
-  route_table_id = aws_route_table.public.id
-}
+  private_subnet_tags = {
+    Name = "${var.name}-private-subnet"
+  }
 
-# Private Route Table
-resource "aws_route_table" "private" {
-  vpc_id = module.vpc.vpc_id
-  tags   = var.tags
-}
+    public_route_table_tags = {
+    Name = "${var.name}-public-routetable"
+  }
 
-# Associate private subnets with the private route table
-resource "aws_route_table_association" "private" {
-  count          = length(module.vpc.private_subnets)
-  subnet_id      = element(module.vpc.private_subnets, count.index)
-  route_table_id = aws_route_table.private.id
+  private_route_table_tags = {
+    Name = "${var.name}-private-routetable"
+}
 }

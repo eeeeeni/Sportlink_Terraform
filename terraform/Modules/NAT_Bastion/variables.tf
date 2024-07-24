@@ -1,5 +1,5 @@
 variable "name" {
-  description = "The name of the resources"
+  description = "The name of the Bastion"
   type        = string
 }
 
@@ -18,30 +18,34 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "private_route_table_ids" {  # 새 변수 추가
+variable "private_route_table_ids" {
   description = "The IDs of the private route tables"
   type        = list(string)
 }
 
+variable "nat_gateway_ids" {
+  description = "The IDs of the NAT Gateways"
+  type        = list(string)
+}
+
 variable "ami" {
-  description = "The AMI to use for the Bastion host"
+  description = "The AMI ID for the Bastion host"
   type        = string
 }
 
 variable "instance_type" {
-  description = "The instance type to use for the Bastion host"
+  description = "The instance type for the Bastion host"
   type        = string
 }
 
 variable "key_name" {
-  description = "The key name to use for the Bastion host"
+  description = "The key name for the Bastion host"
   type        = string
 }
 
 variable "single_nat_gateway" {
-  description = "Use a single NAT gateway"
+  description = "Use a single NAT Gateway"
   type        = bool
-  default     = false
 }
 
 variable "tags" {
