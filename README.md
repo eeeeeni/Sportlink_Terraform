@@ -15,6 +15,3 @@
             private1 sub : 10.0.2.0/24
             private2 sub : 10.0.3.0/24
             fake sub : 10.0.4.0/24
-    rds 이름 : devRDS
-    rds 유저 : admin
-    rds 비번 : password
