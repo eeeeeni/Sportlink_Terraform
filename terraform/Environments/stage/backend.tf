@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket  = "sportlink-terraform-backend"
+    bucket  = "sportlink-terraform-backend-enitest"
     key     = "stage/terraform.tfstate"
     region  = "ap-northeast-2"
-    profile = "terraform_user"
-    dynamodb_table = "sportlink-terraform-bucket-lock"
+    profile = "Admin3"
+    dynamodb_table = "sportlink-terraform-bucket-eni-test-lock"
     encrypt        = true
   }
 
@@ -18,5 +18,5 @@ terraform {
 
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "terraform_user"
+  profile = "Admin3"
 }

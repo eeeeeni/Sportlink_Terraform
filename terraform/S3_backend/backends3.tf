@@ -9,13 +9,13 @@ terraform {
 
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "terraform_user"
+  profile = "Admin3"
 }
 
 
 # AWS S3 Bucket 생성
 resource "aws_s3_bucket" "terraform_state" {
-  bucket ="sportlink-terraform-backend"
+  bucket ="sportlink-terraform-backend-enitest"
   tags = {
     Name = "terraform_state"
   }
@@ -52,7 +52,7 @@ resource "aws_s3_bucket_versioning" "terraform_state_ver" {
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "sportlink-terraform-bucket-lock"
+  name         = "sportlink-terraform-bucket-eni-test-lock"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 

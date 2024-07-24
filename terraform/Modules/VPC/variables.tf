@@ -9,7 +9,7 @@ variable "cidr" {
 }
 
 variable "availability_zones" {
-  description = "The availability zones for the subnets"
+  description = "The availability zones"
   type        = list(string)
 }
 
@@ -24,6 +24,6 @@ variable "public_subnet_cidr_blocks" {
 }
 
 variable "tags" {
-  description = "A mapping of tags to assign to the resource"
+  description = "A map of tags to add to all resources"
   type        = map(string)
 }
