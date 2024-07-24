@@ -9,42 +9,23 @@ variable "cidr" {
 }
 
 variable "availability_zones" {
-  description = "List of availability zones"
+  description = "A list of availability zones in the region"
   type        = list(string)
 }
 
 variable "private_subnet_cidr_blocks" {
-  description = "List of CIDR blocks for the private subnets"
+  description = "A list of private subnet CIDR blocks"
   type        = list(string)
 }
 
 variable "public_subnet_cidr_blocks" {
-  description = "List of CIDR blocks for the public subnets"
+  description = "A list of public subnet CIDR blocks"
   type        = list(string)
 }
 
 variable "tags" {
-  description = "A map of tags to add to all resources"
+  description = "A map of tags to assign to the resources"
   type        = map(string)
+  default     = {}
 }
-
-# variable "database_subnet_cidr_blocks" {
-#   description = "List of CIDR blocks for the database subnets"
-#   type        = list(string)
-# }
-
-# variable "enable_nat_gateway" {
-#   description = "Enable NAT Gateway"
-#   type        = bool
-# }
-
-# variable "single_nat_gateway" {
-#   description = "Use a single NAT Gateway"
-#   type        = bool
-# }
-
-# variable "one_nat_gateway_per_az" {
-#   description = "Use one NAT Gateway per availability zone"
-#   type        = bool
-# }
 

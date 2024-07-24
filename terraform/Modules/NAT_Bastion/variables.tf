@@ -18,16 +18,6 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "private_route_table_ids" {
-  description = "The IDs of the private route tables"
-  type        = list(string)
-}
-
-variable "nat_gateway_ids" {
-  description = "The IDs of the NAT Gateways"
-  type        = list(string)
-}
-
 variable "ami" {
   description = "The AMI ID for the Bastion host"
   type        = string
@@ -43,12 +33,8 @@ variable "key_name" {
   type        = string
 }
 
-variable "single_nat_gateway" {
-  description = "Use a single NAT Gateway"
-  type        = bool
-}
-
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
 }
+

@@ -1,15 +1,3 @@
-resource "aws_eip" "nat" {
-  count = var.single_nat_gateway ? 1 : length(var.public_subnet_ids)
-  domain = "vpc"
-}
-
-resource "aws_nat_gateway" "this" {
-  count         = var.single_nat_gateway ? 1 : length(var.public_subnet_ids)
-  allocation_id = element(aws_eip.nat.*.id, count.index)
-  subnet_id     = element(var.public_subnet_ids, count.index % length(var.public_subnet_ids))
-  tags          = var.tags
-}
-
 resource "aws_security_group" "bastion_sg" {
   vpc_id      = var.vpc_id
   name        = "${var.name}-bastion-sg"
@@ -43,24 +31,19 @@ resource "aws_security_group" "bastion_sg" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                         = var.ami
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
-  subnet_id                   = element(var.public_subnet_ids, 0)
+  count                      = length(var.public_subnet_ids)
+  ami                        = var.ami
+  instance_type              = var.instance_type
+  key_name                   = var.key_name
+  subnet_id                  = element(var.public_subnet_ids, count.index)
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
+  vpc_security_group_ids     = [aws_security_group.bastion_sg.id]
 
-  tags = var.tags
+  tags = merge(var.tags, { Name = "${var.name}-bastion-${count.index}" })
 }
 
-resource "aws_route" "private_nat" {
-  count                  = length(var.private_subnet_ids)
-  route_table_id         = element(var.private_route_table_ids, count.index)
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, count.index % length(aws_nat_gateway.this.*.id))
+output "bastion_sg_id" {
+  description = "The ID of the bastion security group"
+  value       = aws_security_group.bastion_sg.id
 }
 
-output "nat_gateway_ids" {
-  description = "The IDs of the NAT Gateways"
-  value       = aws_nat_gateway.this.*.id
-}

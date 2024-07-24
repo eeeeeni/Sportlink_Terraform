@@ -13,17 +13,9 @@ output "private_subnets" {
   value       = module.vpc.private_subnets
 }
 
-# output "database_subnets" {
-#   description = "The IDs of the database subnets"
-#   value       = module.vpc.database_subnets
-# }
-
-# output "nat_gateway_ids" {
-#   description = "The IDs of the NAT Gateways"
-#   value       = module.vpc.nat_gateway_ids
-# }
-
-output "private_route_table_ids" {
-  description = "The IDs of the private route tables"
-  value       = module.vpc.private_route_table_ids
+output "public_route_table_ids" {
+  description = "The IDs of the public route tables"
+  value       = module.vpc.public_route_table_ids
 }
+
+

@@ -20,6 +20,7 @@ module "vpc" {
   }
 }
 
+
 module "nat_bastion" {
   source = "../../Modules/NAT_Bastion"
 
@@ -27,21 +28,15 @@ module "nat_bastion" {
   vpc_id = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
-  private_route_table_ids = module.vpc.private_route_table_ids
-  nat_gateway_ids = module.nat_bastion.nat_gateway_ids  
 
   ami = "ami-0ea4d4b8dc1e46212"
   instance_type = "t2.micro"
   key_name = "bastion-key"
 
-  single_nat_gateway = false
-
   tags = {
     Name = "stage-nat-bastion"
   }
 }
-
-
 # module "eks" {
 #   source  = "terraform-aws-modules/eks/aws"
 #   version = "~> 20.0"
