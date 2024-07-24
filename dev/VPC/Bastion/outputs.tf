@@ -1,8 +1,9 @@
-output "instance_id" {
-  value = aws_instance.bastion.id
+output "bastion_a_public_ip" {
+  description = "The public IP of the first bastion host"
+  value       = aws_instance.bastion_a.public_ip
 }
 
-output "bastion_public_ip" {
-  description = "The public IP address of the Bastion Host"
-  value       = aws_instance.bastion.public_ip
+output "bastion_b_public_ip" {
+  description = "The public IP of the second bastion host"
+  value       = aws_instance.bastion_b.public_ip
 }
