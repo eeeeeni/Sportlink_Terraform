@@ -1,8 +1,8 @@
-module "image_s3_bucket" {
-  source = "../../Modules/S3_image"
-  bucket_name = "stage-sportlink-image-bucket-stage-test"
-  environment = "stage"
-}
+# module "image_s3_bucket" {
+#   source = "../../Modules/S3_image"
+#   bucket_name = "stage-sportlink-image-bucket-stage-test"
+#   environment = "stage"
+# }
 
 module "vpc" {
   source = "../../Modules/VPC"
@@ -11,11 +11,12 @@ module "vpc" {
   cidr = "192.168.0.0/16"
 
   availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
-  private_subnet_cidr_blocks = ["192.168.2.0/24", "192.168.3.0/24", "192.168.4.0/24", "192.168.5.0/24"]
-  public_subnet_cidr_blocks  = ["192.168.1.0/24", "192.168.6.0/24"]
+  private_subnet_cidr_blocks = ["192.168.3.0/24", "192.168.4.0/24", "192.168.5.0/24", "192.168.6.0/24"]
+  public_subnet_cidr_blocks = ["192.168.1.0/24", "192.168.2.0/24"]
+
 
   tags = {
-    Name = "stage-vpc"
+    Environment = "stage"
   }
 }
 
@@ -27,6 +28,7 @@ module "nat_bastion" {
   public_subnet_ids = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
   private_route_table_ids = module.vpc.private_route_table_ids
+  nat_gateway_ids = module.nat_bastion.nat_gateway_ids  
 
   ami = "ami-0ea4d4b8dc1e46212"
   instance_type = "t2.micro"
@@ -39,48 +41,49 @@ module "nat_bastion" {
   }
 }
 
-module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
 
-  cluster_name    = "main-cluster"
-  cluster_version = "1.24"
-  vpc_id          = module.vpc.vpc_id
-  subnet_ids      = module.vpc.private_subnets
+# module "eks" {
+#   source  = "terraform-aws-modules/eks/aws"
+#   version = "~> 20.0"
 
-  enable_irsa = true
+#   cluster_name    = "main-cluster"
+#   cluster_version = "1.24"
+#   vpc_id          = module.vpc.vpc_id
+#   subnet_ids      = module.vpc.private_subnets
 
-  eks_managed_node_groups = {
-    EKS_Worker_Node = {
-      instance_types = ["t3.small"]
-      min_size       = 2
-      max_size       = 3
-      desired_size   = 2
-    }
-  }
+#   enable_irsa = true
 
-  cluster_endpoint_public_access = true
+#   eks_managed_node_groups = {
+#     EKS_Worker_Node = {
+#       instance_types = ["t3.small"]
+#       min_size       = 2
+#       max_size       = 3
+#       desired_size   = 2
+#     }
+#   }
 
-  enable_cluster_creator_admin_permissions = true
-}
+#   cluster_endpoint_public_access = true
 
-# EKS 클러스터의 보안 그룹 가져오기
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_id
-  depends_on = [module.eks]
-}
+#   enable_cluster_creator_admin_permissions = true
+# }
 
-# Bastion 호스트 보안 그룹을 EKS 클러스터의 보안 그룹에 추가
-resource "aws_security_group_rule" "bastion_to_eks" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  security_group_id        = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
-  source_security_group_id = module.nat_bastion.bastion_sg_id
+# # EKS 클러스터의 보안 그룹 가져오기
+# data "aws_eks_cluster" "cluster" {
+#   name = module.eks.cluster_id
+#   depends_on = [module.eks]
+# }
 
-  depends_on = [module.eks]
-}
+# # Bastion 호스트 보안 그룹을 EKS 클러스터의 보안 그룹에 추가
+# resource "aws_security_group_rule" "bastion_to_eks" {
+#   type                     = "ingress"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   security_group_id        = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
+#   source_security_group_id = module.nat_bastion.bastion_sg_id
+
+#   depends_on = [module.eks]
+# }
 
 
 # module "iam" {
