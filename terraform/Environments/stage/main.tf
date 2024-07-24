@@ -20,9 +20,8 @@ module "vpc" {
   }
 }
 
-
 module "nat_bastion" {
-  source = "../../Modules/NAT_Bastion"
+  source = "../../Modules/Bastion"
 
   name = "stage-nat-bastion"
   vpc_id = module.vpc.vpc_id
@@ -37,6 +36,8 @@ module "nat_bastion" {
     Name = "stage-nat-bastion"
   }
 }
+
+
 # module "eks" {
 #   source  = "terraform-aws-modules/eks/aws"
 #   version = "~> 20.0"

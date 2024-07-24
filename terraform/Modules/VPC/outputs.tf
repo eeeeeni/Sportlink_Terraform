@@ -18,4 +18,8 @@ output "public_route_table_ids" {
   value       = module.vpc.public_route_table_ids
 }
 
+output "private_route_table_ids" {
+  description = "The IDs of the private route tables"
+  value       = module.vpc.private_route_table_ids
+}
 
