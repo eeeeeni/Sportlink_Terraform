@@ -1,24 +1,24 @@
-output "eks_cluster_name" {
-  description = "The name of the EKS cluster"
-  value       = module.eks.cluster_name
+output "eks_cluster_sg_id" {
+  description = "Security Group ID for EKS Cluster"
+  value       = aws_security_group.eks_cluster_sg.id
 }
 
-output "eks_cluster_arn" {
-  description = "The ARN of the EKS cluster"
-  value       = module.eks.cluster_arn
+output "eks_node_sg_id" {
+  description = "Security Group ID for EKS Node Group"
+  value       = aws_security_group.eks_node_sg.id
+}
+
+output "eks_cluster_name" {
+  description = "EKS Cluster Name"
+  value       = aws_eks_cluster.eks.name
 }
 
 output "eks_cluster_endpoint" {
-  description = "The endpoint URL of the EKS cluster"
-  value       = module.eks.cluster_endpoint
+  description = "EKS Cluster Endpoint"
+  value       = aws_eks_cluster.eks.endpoint
 }
 
-output "eks_cluster_certificate_authority_data" {
-  description = "The certificate authority data for the EKS cluster"
-  value       = module.eks.cluster_certificate_authority_data
-}
-
-output "eks_node_groups" {
-  description = "Information about EKS node groups"
-  value       = module.eks.eks_managed_node_groups
+output "eks_node_group_name" {
+  description = "EKS Node Group Name"
+  value       = aws_eks_node_group.eks_nodes.node_group_name
 }

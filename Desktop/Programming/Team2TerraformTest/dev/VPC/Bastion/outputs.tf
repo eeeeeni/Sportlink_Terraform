@@ -1,15 +1,9 @@
-output "bastion_instance_ids" {
-  description = "The instance IDs of the Bastion Hosts"
-  value = {
-    bastion_1 = aws_instance.bastion.id
-    bastion_2 = aws_instance.bastion_2.id
-  }
+output "bastion_a_public_ip" {
+  description = "The public IP of the first bastion host"
+  value       = aws_instance.bastion_a.public_ip
 }
 
-output "bastion_public_ips" {
-  description = "The public IP addresses of the Bastion Hosts"
-  value = {
-    bastion_1 = aws_instance.bastion.public_ip
-    bastion_2 = aws_instance.bastion_2.public_ip
-  }
+output "bastion_b_public_ip" {
+  description = "The public IP of the second bastion host"
+  value       = aws_instance.bastion_b.public_ip
 }

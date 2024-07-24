@@ -29,27 +29,25 @@ data "terraform_remote_state" "sg" {
   }
 }
 
-# 기존 Bastion 호스트
-resource "aws_instance" "bastion" {
+# 첫 번째 Bastion 호스트
+resource "aws_instance" "bastion_a" {
   ami           = "ami-0ea4d4b8dc1e46212"  # 사용할 AMI ID
-  instance_type = "t2.micro"
+  instance_type = "t3.small"
   subnet_id     = data.terraform_remote_state.vpc.outputs.public_subnet_id
   security_groups = [data.terraform_remote_state.sg.outputs.bastion_sg_id]  # Bastion SG
   key_name       = "bastion-key"
-
   tags = {
     Name = "${data.terraform_remote_state.vpc.outputs.vpc_name}-bastion-a"
   }
 }
 
-# 추가 Bastion 호스트
-resource "aws_instance" "bastion_2" {
+# 두 번째 Bastion 호스트
+resource "aws_instance" "bastion_b" {
   ami           = "ami-0ea4d4b8dc1e46212"  # 사용할 AMI ID
-  instance_type = "t2.micro"
+  instance_type = "t3.small"
   subnet_id     = data.terraform_remote_state.vpc.outputs.public_subnet_id
   security_groups = [data.terraform_remote_state.sg.outputs.bastion_sg_id]  # Bastion SG
   key_name       = "bastion-key"
-
   tags = {
     Name = "${data.terraform_remote_state.vpc.outputs.vpc_name}-bastion-b"
   }
