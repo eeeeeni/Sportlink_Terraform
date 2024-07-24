@@ -48,27 +48,26 @@ data "aws_security_group" "rds" {
 
 # RDS Subnet Group 생성
 resource "aws_db_subnet_group" "main" {
-  name       = "dev-rds-subnet-group"
-  subnet_ids = [ 
-    data.terraform_remote_state.vpc.outputs.private_subnet2_id, 
+  name = "dev-rds-subnet-group"
+  subnet_ids = [
+    data.terraform_remote_state.vpc.outputs.private_subnet2_id,
     data.terraform_remote_state.vpc.outputs.fake_subnet_id
-    ]
+  ]
 
   tags = {
     Name = "dev-rds-subnet-group"
   }
 }
 
-# RDS 인스턴스 생성
 resource "aws_db_instance" "main" {
   allocated_storage      = 20
   storage_type           = "gp2"
   engine                 = "mysql"
   engine_version         = "5.7"
   instance_class         = "db.t3.micro"
-  db_name                = "devRDS"
-  username               = "admin"
-  password               = "password"
+  db_name                = var.rds_db_name
+  username               = var.rds_username
+  password               = var.rds_password
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [data.terraform_remote_state.sg.outputs.rds_sg_id]
   skip_final_snapshot    = true
