@@ -1,8 +1,8 @@
-# module "image_s3_bucket" {
-#   source = "../../Modules/S3_image"
-#   bucket_name = "stage-sportlink-image-bucket-stage-test"
-#   environment = "stage"
-# }
+module "image_s3_bucket" {
+  source = "../../Modules/S3_image"
+  bucket_name = "stage-sportlink-image-bucket-stage-test"
+  environment = "stage"
+}
 
 module "vpc" {
   source = "../../Modules/VPC"
@@ -20,24 +20,32 @@ module "vpc" {
   }
 }
 
+module "security_group" {
+  source  = "../../Modules/SG"
+  name    = "stage-bastion-sg"
+  vpc_id  = module.vpc.vpc_id
+
+  tags = {
+    Name = "stage-bastion-sg"
+  }
+}
+
 module "nat_bastion" {
-  source = "../../Modules/Bastion"
-
-  name = "stage-nat-bastion"
-  vpc_id = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnets
+  source             = "../../Modules/Bastion"
+  name               = "stage-nat-bastion"
+  vpc_id             = module.vpc.vpc_id
+  public_subnet_ids  = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
+  security_group_id  = module.security_group.security_group_id
 
-  ami = "ami-0ea4d4b8dc1e46212"
+  ami           = "ami-0ea4d4b8dc1e46212"
   instance_type = "t2.micro"
-  key_name = "bastion-key"
+  key_name      = "bastion-key"
 
   tags = {
     Name = "stage-nat-bastion"
   }
 }
-
-
 # module "eks" {
 #   source  = "terraform-aws-modules/eks/aws"
 #   version = "~> 20.0"

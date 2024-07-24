@@ -38,3 +38,7 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "security_group_id" {
+  description = "The ID of the security group to associate with Bastion hosts"
+  type        = string
+}
