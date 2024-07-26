@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-backend-sportlink"
+    bucket         = "backend-test"
     key            = "eks/state.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "terraform-backend-sportlink-locks"
+    dynamodb_table = "test-dynamoDB"
   }
 }
 
@@ -14,7 +14,7 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }
@@ -231,6 +231,40 @@ resource "aws_iam_role" "eks_node" {
       }
     ]
   })
+}
+
+# S3 버킷 접근을 위한 IAM 정책 생성
+resource "aws_iam_policy" "s3_access_policy" {
+  name = "S3AccessPolicy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:s3:::terraform-backend-sportlink"
+      },
+      {
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:s3:::terraform-backend-sportlink/*"
+      }
+    ]
+  })
+}
+
+# IAM 역할에 정책 연결
+resource "aws_iam_role_policy_attachment" "eks_role_policy_attachment" {
+  role       = aws_iam_role.eks_cluster.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_AmazonEKSWorkerNodePolicy" {
