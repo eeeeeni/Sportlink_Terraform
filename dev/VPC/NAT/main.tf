@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-backend-sportlink"
-    key            = "nat/state.tfstate"
-    region         = "ap-northeast-2"
-    dynamodb_table = "terraform-backend-sportlink-locks"
+    bucket         = "backend-test"  # S3 버킷 이름
+    key            = "nat/state.tfstate"  # S3 내의 상태 파일 경로
+    region         = "ap-northeast-2"  # AWS 리전
+    dynamodb_table = "test-dynamoDB"  # 상태 파일 잠금을 위한 DynamoDB 테이블
   }
 }
 
@@ -15,7 +15,7 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }
@@ -25,7 +25,7 @@ data "terraform_remote_state" "vpc" {
 data "terraform_remote_state" "sg" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "sg/state.tfstate"
     region = "ap-northeast-2"
   }
