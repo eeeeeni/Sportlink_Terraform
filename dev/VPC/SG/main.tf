@@ -46,37 +46,6 @@ resource "aws_security_group" "bastion_sg" {
   }
 }
 
-resource "aws_security_group" "nat_sg" {
-  name        = "dev-vpc-nat-sg"
-  description = "Security group for NAT Gateway"
-  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "dev-vpc-nat-sg"
-  }
-}
-
 resource "aws_security_group" "rds_sg" {
   name        = "dev-vpc-rds-sg"
   description = "Security group for RDS"
@@ -98,45 +67,5 @@ resource "aws_security_group" "rds_sg" {
 
   tags = {
     Name = "dev-vpc-rds-sg"
-  }
-}
-
-# EKS 클러스터 보안 그룹
-resource "aws_security_group" "eks_cluster_sg" {
-  name   = "dev-vpc-eks-cluster-sg"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# EKS 노드 그룹 보안 그룹
-resource "aws_security_group" "eks_node_sg" {
-  name   = "dev-vpc-eks-node-sg"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    security_groups = [aws_security_group.eks_cluster_sg.id]
   }
 }
