@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-backend-sportlink"
+    bucket         = "backend-test"
     key            = "eks/state.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "terraform-backend-sportlink-locks"
+    dynamodb_table = "test-dynamoDB"
   }
 }
 
@@ -14,7 +14,7 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }

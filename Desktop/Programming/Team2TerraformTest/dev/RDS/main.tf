@@ -1,16 +1,16 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-backend-sportlink"
+    bucket         = "backend-test"
     key            = "rds/state.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "terraform-backend-sportlink-locks"
+    dynamodb_table = "test-dynamoDB"
   }
 }
 
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }
@@ -19,7 +19,7 @@ data "terraform_remote_state" "vpc" {
 data "terraform_remote_state" "sg" {
   backend = "s3"
   config = {
-    bucket = "terraform-backend-sportlink"
+    bucket = "backend-test"
     key    = "sg/state.tfstate"
     region = "ap-northeast-2"
   }
