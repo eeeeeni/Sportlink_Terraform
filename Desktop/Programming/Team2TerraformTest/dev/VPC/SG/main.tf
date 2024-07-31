@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "backend-test"  # S3 버킷 이름
+    bucket         = "backend-test-sportlink-1"  # S3 버킷 이름
     key            = "sg/state.tfstate"  # S3 내의 상태 파일 경로
     region         = "ap-northeast-2"  # AWS 리전
-    dynamodb_table = "test-dynamoDB"  # 상태 파일 잠금을 위한 DynamoDB 테이블
+    dynamodb_table = "test-dynamoDB-sportlink-1"  # 상태 파일 잠금을 위한 DynamoDB 테이블
   }
 }
 
@@ -16,7 +16,7 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "backend-test"  
+    bucket = "backend-test-sportlink-1"  
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }

@@ -1,16 +1,16 @@
 terraform {
   backend "s3" {
-    bucket         = "backend-test"
+    bucket         = "backend-test-sportlink-1"
     key            = "rds/state.tfstate"
     region         = "ap-northeast-2"
-    dynamodb_table = "test-dynamoDB"
+    dynamodb_table = "test-dynamoDB-sportlink-1"
   }
 }
 
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "backend-test"
+    bucket = "backend-test-sportlink-1"
     key    = "vpc/state.tfstate"
     region = "ap-northeast-2"
   }
@@ -19,7 +19,7 @@ data "terraform_remote_state" "vpc" {
 data "terraform_remote_state" "sg" {
   backend = "s3"
   config = {
-    bucket = "backend-test"
+    bucket = "backend-test-sportlink-1"
     key    = "sg/state.tfstate"
     region = "ap-northeast-2"
   }
@@ -50,8 +50,7 @@ data "aws_security_group" "rds" {
 resource "aws_db_subnet_group" "main" {
   name = "dev-rds-subnet-group"
   subnet_ids = [
-    data.terraform_remote_state.vpc.outputs.private_subnet2_id,
-    data.terraform_remote_state.vpc.outputs.fake_subnet_id
+    data.terraform_remote_state.vpc.outputs.private_subnet2_id
   ]
 
   tags = {
