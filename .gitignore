@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 # Created by https://www.toptal.com/developers/gitignore/api/windows,terraform,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,terraform,visualstudiocode
+=======
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,terraform
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,terraform
+>>>>>>> origin/main2
 
 ### Terraform ###
 # Local .terraform directories
@@ -56,6 +61,7 @@ terraform.rc
 .history
 .ionide
 
+<<<<<<< HEAD
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -83,3 +89,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,terraform,visualstudiocode
+=======
+# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,terraform
+>>>>>>> origin/main2
