@@ -11,9 +11,8 @@ output "DB_PASSWORD" {
   sensitive   = true
 }
 
-output "rds_endpoint" {
-  description = "RDS instance endpoint"
-  value       = module.rds.this_db_instance_endpoint
+output "DB_HOST" {
+  value = module.rds.db_instance_endpoint
 }
 
 output "db_instance_resource_id" {
