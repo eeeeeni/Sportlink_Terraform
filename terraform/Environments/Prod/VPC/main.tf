@@ -7,7 +7,7 @@ terraform {
     dynamodb_table = "sportlink-terraform-bucket-lock"
     encrypt        = true
   }
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -21,16 +21,17 @@ provider "aws" {
   profile = "terraform_user"
 }
 
-# Prod VPC
+# prod VPC
 module "prod_vpc" {
   source = "github.com/eeeeeni/Terraform-project-VPC"
   name   = "prod_vpc"
   cidr   = local.cidr
 
-  azs              = local.azs
-  public_subnets   = local.public_subnet
-  private_subnets  = local.private_subnets
-  database_subnets = local.database_subnets
+  azs                 = local.azs
+  public_subnets      = local.public_subnet
+  private_subnets     = local.private_subnets
+  elasticache_subnets = local.elasticache_subnets
+  database_subnets    = local.database_subnets
 
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -39,6 +40,7 @@ module "prod_vpc" {
   single_nat_gateway     = false
   one_nat_gateway_per_az = true
 
+  elasticache_subnet_group_name = local.elasticache_subnet_group_name
   tags = {
     "TerraformManaged" = "true"
     "Environment"      = "prod"
@@ -48,7 +50,7 @@ module "prod_vpc" {
 # SSH SG
 module "SSH_SG" {
   source          = "github.com/eeeeeni/Terraform-project-SG"
-  name            = "prod_SSH_SG"
+  name            = "prod-ssh-sg"
   description     = "SSH Port Allow"
   vpc_id          = module.prod_vpc.vpc_id
   use_name_prefix = false
@@ -62,7 +64,7 @@ module "SSH_SG" {
       cidr_blocks = local.all_network
     },
     {
-      from_port   = -1 
+      from_port   = -1 # ICMP에는 포트 번호가 필요 없음
       to_port     = -1
       protocol    = local.icmp_protocol
       description = "ICMP Allow"
@@ -79,9 +81,8 @@ module "SSH_SG" {
   ]
 
   tags = {
-    "Name"        = "SSH_SG"
+    "Name"        = "prod-ssh-sg"
     "Environment" = "prod"
   }
 }
-
 

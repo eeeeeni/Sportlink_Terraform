@@ -35,7 +35,7 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "rds_master_password" {
-  name = "stage-rds-master-password-ooo"
+  name = "sportlink-prod-rds-master-password"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
@@ -50,7 +50,7 @@ resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
 module "RDS_SG" {
   source          = "terraform-aws-modules/security-group/aws"
   version         = "5.1.0"
-  name            = "prod_RDS_SG"
+  name            = "prod-rds-sg"
   description     = "DB Port Allow"
   vpc_id          = data.terraform_remote_state.vpc.outputs.vpc_id
   use_name_prefix = false

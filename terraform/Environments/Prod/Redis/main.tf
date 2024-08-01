@@ -109,21 +109,23 @@ module "elasticache_redis" {
   engine = "redis"
   node_type = "cache.t3.micro"
   num_node_groups = 2
-  replicas_per_node_group = 3
+  replicas_per_node_group = 1
   automatic_failover_enabled = true
   multi_az_enabled = true
   maintenance_window = "sun:05:00-sun:09:00"
   apply_immediately = true
 
-  # Security group
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id 
-  security_group_ids = [aws_security_group.redis_sg.id]
-  subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnets
+    # 전송 암호화 설정
+  transit_encryption_enabled = true # 전송 암호화 활성화
+  transit_encryption_mode    = "preferred" # 전송 암호화 모드 설정
 
-  #   # 보안 그룹 설정 비활성화
-  # create_security_group = false  # 보안 그룹 자동 생성 비활성화
-  # security_group_ids = [aws_security_group.redis_sg.id]  # 수동으로 정의한 보안 그룹 사용
 
+  subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnet_ids
+
+
+    # 보안 그룹 설정 비활성화
+  create_security_group = false  # 보안 그룹 자동 생성 비활성화
+  security_group_ids = [aws_security_group.redis_sg.id]  # 수동으로 정의한 보안 그룹 사용
 
   # Parameter Group
   create_parameter_group = true

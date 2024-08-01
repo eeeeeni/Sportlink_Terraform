@@ -94,3 +94,5 @@ resource "aws_instance" "grafana" {
 # enabled = 1
 # gpgkey = https://packages.grafana.com/gpg.key
 # EOF
+
+

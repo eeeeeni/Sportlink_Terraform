@@ -47,7 +47,7 @@ data "aws_key_pair" "bastion-Key" {
 
 module "BastionHost_SG" {
   source          = "github.com/eeeeeni/Terraform-project-SG"
-  name            = "Prod-BastionHost_SG"
+  name            = "prod-bastion-sg"
   description     = "SSH and ICMP Allow"
   vpc_id          = data.terraform_remote_state.vpc.outputs.vpc_id
   use_name_prefix = false
@@ -78,7 +78,7 @@ module "BastionHost_SG" {
   ]
 
   tags = {
-    "Name"        = "BastionHost_SG"
+    "Name"        = "prod-bastion-sg"
     "Environment" = "Prod"
   }
 }

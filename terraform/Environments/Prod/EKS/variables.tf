@@ -1,11 +1,20 @@
-variable "cluster_name" {
-  description = "The name of the EKS cluster"
-  type        = string
-  default     = "prod-eks"
-}
+# variable "db_host" {
+#   description = "Database host"
+#   type        = string
+# }
 
-variable "cluster_version" {
-  description = "The version of the EKS cluster"
-  type        = string
-  default     = "1.30"
-}
+# variable "db_username" {
+#   description = "Database username"
+#   type        = string
+# }
+
+# variable "db_password" {
+#   description = "Database password"
+#   type        = string
+# }
+
+# variable "s3_bucket" {
+#   description = "S3 Bucket name for storing images"
+#   type        = string
+# }
+

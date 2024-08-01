@@ -36,7 +36,7 @@ resource "aws_acm_certificate" "sportlink_store" {
 }
 
 resource "aws_route53_zone" "sportlink_store" {
-  name = "sport.store"
+  name = "sportlink.store"
 }
 
 resource "aws_route53_record" "sportlink_store_validation" {
