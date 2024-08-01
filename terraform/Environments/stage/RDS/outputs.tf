@@ -10,10 +10,10 @@ output "rds_master_password" {
   sensitive   = true
 }
 
-output "rds_endpoint" {
-  description = "RDS instance endpoint"
-  value       = module.rds.this_db_instance_endpoint
-}
+# output "rds_endpoint" {
+#   description = "RDS instance endpoint"
+#   value       = module.rds.this_db_instance_endpoint
+# }
 
 output "db_instance_resource_id" {
   description = "The ID of the RDS instance"

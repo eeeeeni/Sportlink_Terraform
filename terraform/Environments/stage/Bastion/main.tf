@@ -47,7 +47,7 @@ data "aws_key_pair" "bastion-Key" {
 
 module "BastionHost_SG" {
   source          = "github.com/eeeeeni/Terraform-project-SG"
-  name            = "stage-BastionHost_SG"
+  name            = "stage-bastion-sg"
   description     = "SSH and ICMP Allow"
   vpc_id          = data.terraform_remote_state.vpc.outputs.vpc_id
   use_name_prefix = false
@@ -78,7 +78,7 @@ module "BastionHost_SG" {
   ]
 
   tags = {
-    "Name"        = "BastionHost_SG"
+    "Name"        = "stage-bastion-sg"
     "Environment" = "stage"
   }
 }
@@ -179,7 +179,3 @@ resource "aws_instance" "BastionHost_AZ2" {
   depends_on = [data.terraform_remote_state.eks]
 }
 
-output "bastion_host_sg_id" {
-  description = "The ID of the Bastion Host Security Group"
-  value       = module.BastionHost_SG.security_group_id
-}

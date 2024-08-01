@@ -1,4 +1,4 @@
-erraform {
+terraform {
   backend "s3" {
     bucket         = "sportlink-terraform-backend"
     key            = "Stage/Grafana/terraform.tfstate"
@@ -33,7 +33,7 @@ data "terraform_remote_state" "vpc" {
 }
 
 # Grafana 인스턴스에 대한 보안 그룹 생성
-resource "aws_security_group" "grafana_sg" {
+resource "aws_security_group" "stage-grafana-sg" {
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
 
   egress {
@@ -56,6 +56,10 @@ resource "aws_security_group" "grafana_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  # 허용할 CIDR 범위
   }
+
+  tags = {
+    Name = "stage-Grafana-sg"
+  }
 }
 
 # Grafana를 설치할 EC2 인스턴스 생성
@@ -63,19 +67,30 @@ resource "aws_instance" "grafana" {
   ami           = "ami-0ea4d4b8dc1e46212"
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  vpc_security_group_ids = [aws_security_group.grafana_sg.id]
+  vpc_security_group_ids = [aws_security_group.stage-grafana-sg.id]
   subnet_id     = data.terraform_remote_state.vpc.outputs.public_subnet_ids[0]
   key_name       = "grafana-key"
 
   tags = {
-    Name = "GrafanaServer"
+    Name = "stage-Grafana-Server"
   }
 
   user_data = <<-EOF
               sudo yum update -y
+              sudo tee /etc/yum.repos.d/grafana.repo
               sudo yum install grafana -y
               sudo systemctl start grafana-server
               sudo systemctl enable grafana-server
               echo "Grafana has been installed and started successfully."
               EOF
 }
+
+#  <<EOF
+# [grafana]
+# name = Grafana
+# baseurl = https://packages.grafana.com/oss/rpm
+# repo_gpgcheck = 1
+# gpgcheck = 1
+# enabled = 1
+# gpgkey = https://packages.grafana.com/gpg.key
+# EOF

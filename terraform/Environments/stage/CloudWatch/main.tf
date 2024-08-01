@@ -103,7 +103,7 @@ resource "aws_iam_role_policy_attachment" "lambda_role_policy_attachment" {
 # Lambda 함수 생성
 resource "aws_lambda_function" "slack_notifier" {
   filename         = "lambda_function_payload.zip"
-  function_name    = "slack_notifier"
+  function_name    = "stage_slack_notifier"
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.9"
@@ -142,12 +142,13 @@ resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
 
 # S3 버킷 생성
 resource "aws_s3_bucket" "cloudtrail_bucket" {
-  bucket_prefix = "cloudtrail-logs-"
+  bucket = "stage-cloudtrail-bucket"
 }
+
 
 # IAM 역할 생성
 resource "aws_iam_role" "cloudtrail_role" {
-  name = "cloudtrail_role"
+  name = "stage-cloudtrail_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -165,7 +166,7 @@ resource "aws_iam_role" "cloudtrail_role" {
 
 # IAM 정책 생성
 resource "aws_iam_policy" "cloudtrail_policy" {
-  name        = "cloudtrail_policy"
+  name        = "stage_cloudtrail_policy"
   description = "Policy for CloudTrail to write logs to CloudWatch Logs"
 
   policy = jsonencode({
