@@ -6,12 +6,12 @@ locals {
   all_network  = "0.0.0.0/0"
 }
 
-variable "db_username" {
+variable "DB_USERNAME" {
   description = "RDS DB UserName"
   type        = string
 }
 
-variable "db_password" {
+variable "DB_PASSWORD" {
   description = "RDS DB Password"
   type        = string
 }

@@ -35,14 +35,14 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "rds_master_password" {
-  name = "sportlink-stage-rds-master-password"
+  name = "sportlink-stage-rds-master-password-o"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
   secret_id     = aws_secretsmanager_secret.rds_master_password.id
   secret_string = jsonencode({
-    username = var.db_username
-    password = var.db_password
+    username = var.DB_USERNAME
+    password = var.DB_PASSWORD
   })
 }
 
