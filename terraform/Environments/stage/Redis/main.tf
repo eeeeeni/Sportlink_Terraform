@@ -93,8 +93,7 @@ resource "aws_security_group" "redis_sg" {
 # ElastiCache Subnet Group
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
   name       = "stage-redis-subnet-group"
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnet_ids
-  # subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnet_ids
+  subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnet_ids
 
   tags = {
     Name = "stage-redis-subnet-group"
@@ -110,16 +109,17 @@ module "elasticache_redis" {
   engine = "redis"
   node_type = "cache.t3.micro"
   num_node_groups = 2
-  replicas_per_node_group = 3
+  replicas_per_node_group = 1
   automatic_failover_enabled = true
   multi_az_enabled = true
   maintenance_window = "sun:05:00-sun:09:00"
   apply_immediately = true
 
-  # # Security group
-  # vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id 
-  # security_group_ids = [aws_security_group.redis_sg.id]
-  # subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnets
+  subnet_ids = data.terraform_remote_state.vpc.outputs.elasticache_subnet_ids
+
+    # 전송 암호화 설정
+  transit_encryption_enabled = true # 전송 암호화 활성화
+  transit_encryption_mode    = "preferred" # 전송 암호화 모드 설정
 
     # 보안 그룹 설정 비활성화
   create_security_group = false  # 보안 그룹 자동 생성 비활성화
@@ -141,14 +141,6 @@ module "elasticache_redis" {
   }
 }
 
-output "redis_security_group_id" {
-  description = "The ID of the Redis security group"
-  value = aws_security_group.redis_sg.id
-}
 
-output "redis_replication_group_id" {
-  description = "The ID of the Redis replication group"
-  value = module.elasticache_redis.replication_group_id
-}
 
 

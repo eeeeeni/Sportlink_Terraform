@@ -35,7 +35,7 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "rds_master_password" {
-  name = "stage-rds-master-password-ooooo"
+  name = "sportlink-stage-rds-master-password"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
@@ -50,7 +50,7 @@ resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
 module "RDS_SG" {
   source          = "terraform-aws-modules/security-group/aws"
   version         = "5.1.0"
-  name            = "stage-RDS_SG"
+  name            = "stage-rds-sg"
   description     = "DB Port Allow"
   vpc_id          = data.terraform_remote_state.vpc.outputs.vpc_id
   use_name_prefix = false
@@ -82,7 +82,7 @@ module "RDS_SG" {
   ]
 }
 
-resource "aws_db_subnet_group" "stage-rds" {
+resource "aws_db_subnet_group" "default" {
   name       = "stage-rds-subnet-group"
   subnet_ids = data.terraform_remote_state.vpc.outputs.database_subnet_ids
 
@@ -122,5 +122,5 @@ module "rds" {
 
   subnet_ids             = data.terraform_remote_state.vpc.outputs.database_subnet_ids
   vpc_security_group_ids = [module.RDS_SG.security_group_id]
-  db_subnet_group_name   = aws_db_subnet_group.stage-rds.name
+  db_subnet_group_name   = aws_db_subnet_group.default.name
 }

@@ -50,7 +50,7 @@ module "stage_vpc" {
 # SSH SG
 module "SSH_SG" {
   source          = "github.com/eeeeeni/Terraform-project-SG"
-  name            = "stage_SSH_SG"
+  name            = "stage_ssh_sg"
   description     = "SSH Port Allow"
   vpc_id          = module.stage_vpc.vpc_id
   use_name_prefix = false
@@ -81,7 +81,7 @@ module "SSH_SG" {
   ]
 
   tags = {
-    "Name"        = "SSH_SG"
+    "Name"        = "stage-ssh-sg"
     "Environment" = "stage"
   }
 }

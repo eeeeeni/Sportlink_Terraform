@@ -119,8 +119,14 @@ resource "aws_instance" "BastionHost_AZ1" {
             tar -zxvf k9s_Linux_amd64.tar.gz
             sudo mv k9s /usr/local/bin/
 
+            # helm 설치
+            curl -fsSL -o ~/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 ~/get_helm.sh
+            ~/get_helm.sh
+
             # Clean up
             rm k9s_Linux_amd64.tar.gz
+            rm awscliv2.zip
             EOF
 
   tags = {
@@ -167,8 +173,14 @@ resource "aws_instance" "BastionHost_AZ2" {
             tar -zxvf k9s_Linux_amd64.tar.gz
             sudo mv k9s /usr/local/bin/
 
+            # helm 설치
+            curl -fsSL -o ~/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 ~/get_helm.sh
+            ~/get_helm.sh
+
             # Clean up
             rm k9s_Linux_amd64.tar.gz
+            rm awscliv2.zip
             EOF
 
   tags = {
@@ -179,3 +191,7 @@ resource "aws_instance" "BastionHost_AZ2" {
   depends_on = [data.terraform_remote_state.eks]
 }
 
+output "bastion_host_sg_id" {
+  description = "The ID of the Bastion Host Security Group"
+  value       = module.BastionHost_SG.security_group_id
+}
