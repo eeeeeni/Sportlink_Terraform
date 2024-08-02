@@ -10,7 +10,7 @@ data "terraform_remote_state" "rds" {
   backend = "s3"
   config = {
     bucket         = "sportlink-terraform-backend"
-    key            = "Stage/RDS/terraform.tfstate"
+    key            = "Prod/RDS/terraform.tfstate"
     region         = "ap-northeast-2"
     profile        = "terraform_user"
     dynamodb_table = "sportlink-terraform-bucket-lock"
