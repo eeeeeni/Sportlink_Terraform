@@ -38,6 +38,18 @@ data "terraform_remote_state" "bastion" {
   }
 }
 
+data "terraform_remote_state" "rds" {
+  backend = "s3"
+  config = {
+    bucket = "sportlink-terraform-backend"
+    key    = "Stage/RDS/terraform.tfstate"
+    region = "ap-northeast-2"
+    profile = "terraform_user"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
 # SNS Topic 생성
 resource "aws_sns_topic" "bastion_az1_topic" {
   name = "bastion_az1_topic"
@@ -112,7 +124,7 @@ resource "aws_lambda_function" "slack_notifier" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
     }
   }
 }
@@ -145,6 +157,25 @@ resource "aws_s3_bucket" "cloudtrail_bucket" {
   bucket = "stage-cloudtrail-bucket"
 }
 
+# S3 버킷 정책 생성
+resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
+  bucket = aws_s3_bucket.cloudtrail_bucket.bucket
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "CloudTrailLogs",
+        Effect = "Allow",
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        },
+        Action   = "s3:PutObject",
+        Resource = "${aws_s3_bucket.cloudtrail_bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+      }
+    ]
+  })
+}
 
 # IAM 역할 생성
 resource "aws_iam_role" "cloudtrail_role" {
@@ -167,7 +198,7 @@ resource "aws_iam_role" "cloudtrail_role" {
 # IAM 정책 생성
 resource "aws_iam_policy" "cloudtrail_policy" {
   name        = "stage_cloudtrail_policy"
-  description = "Policy for CloudTrail to write logs to CloudWatch Logs"
+  description = "Policy for CloudTrail to write logs to CloudWatch Logs and S3"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -180,6 +211,16 @@ resource "aws_iam_policy" "cloudtrail_policy" {
           "logs:CreateLogGroup"
         ],
         Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:PutObject",
+          "s3:GetBucketAcl"
+        ],
+        Resource = [
+          "${aws_s3_bucket.cloudtrail_bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+        ]
       }
     ]
   })
@@ -191,6 +232,7 @@ resource "aws_iam_role_policy_attachment" "cloudtrail_role_policy_attachment" {
   policy_arn  = aws_iam_policy.cloudtrail_policy.arn
 }
 
+# CloudTrail 생성
 resource "aws_cloudtrail" "main" {
   name                          = "stage-cloudtrail"
   s3_bucket_name                = aws_s3_bucket.cloudtrail_bucket.bucket
@@ -282,10 +324,9 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   alarm_actions             = [aws_sns_topic.bastion_az1_topic.arn]
 
   dimensions = {
-    DBInstanceIdentifier = "Module.rds.db_instance_resource_id"
+    DBInstanceIdentifier = data.terraform_remote_state.rds.outputs.db_instance_resource_id
   }
 }
-
 
 # SNS Topic Subscription for Lambda
 resource "aws_sns_topic_subscription" "lambda_subscription_az1" {
