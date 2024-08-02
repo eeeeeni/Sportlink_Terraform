@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket         = "sportlink-terraform-backend"
-    key            = "Stage/Grafana/terraform.tfstate"
+    key            = "Prod/Grafana/terraform.tfstate"
     region         = "ap-northeast-2"
     profile        = "terraform_user"
     dynamodb_table = "sportlink-terraform-bucket-lock"
@@ -26,14 +26,14 @@ data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
     bucket = "sportlink-terraform-backend"
-    key    = "Stage/VPC/terraform.tfstate"
+    key    = "Prod/VPC/terraform.tfstate"
     region = "ap-northeast-2"
     profile = "terraform_user"
   }
 }
 
 # Grafana 인스턴스에 대한 보안 그룹 생성
-resource "aws_security_group" "stage-grafana-sg" {
+resource "aws_security_group" "prod-grafana-sg" {
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
 
   egress {
@@ -58,7 +58,7 @@ resource "aws_security_group" "stage-grafana-sg" {
   }
 
   tags = {
-    Name = "stage-Grafana-sg"
+    Name = "prod-Grafana-sg"
   }
 }
 
@@ -67,12 +67,12 @@ resource "aws_instance" "grafana" {
   ami           = "ami-0ea4d4b8dc1e46212"
   instance_type = "t2.micro"
   associate_public_ip_address = true
-  vpc_security_group_ids = [aws_security_group.stage-grafana-sg.id]
+  vpc_security_group_ids = [aws_security_group.prod-grafana-sg.id]
   subnet_id     = data.terraform_remote_state.vpc.outputs.public_subnet_ids[0]
   key_name       = "grafana-key"
 
   tags = {
-    Name = "stage-Grafana-Server"
+    Name = "prod-Grafana-Server"
   }
 
   user_data = <<-EOF
@@ -84,3 +84,5 @@ resource "aws_instance" "grafana" {
               echo "Grafana has been installed and started successfully."
               EOF
 }
+
+
