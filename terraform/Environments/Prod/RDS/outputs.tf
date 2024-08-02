@@ -19,3 +19,8 @@ output "db_instance_resource_id" {
   description = "The ID of the RDS instance"
   value       = module.rds.db_instance_resource_id
 }
+
+output "DB_PORT" {
+  description = "The port on which the RDS instance is listening"
+  value       = module.rds.port
+}

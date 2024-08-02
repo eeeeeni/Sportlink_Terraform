@@ -1,4 +1,3 @@
-
 output "DB_USERNAME" {
   description = "The master username for the RDS instance"
   value       = jsondecode(aws_secretsmanager_secret_version.rds_master_password_version.secret_string).username
@@ -15,7 +14,19 @@ output "DB_HOST" {
   value = module.rds.db_instance_endpoint
 }
 
+output "DB_NAME" {
+  value = module.rds.db_name
+}
+
 output "db_instance_resource_id" {
   description = "The ID of the RDS instance"
   value       = module.rds.db_instance_resource_id
 }
+
+output "DB_PORT" {
+  description = "The port on which the RDS instance is listening"
+  value       = module.rds.port
+}
+
+
+
