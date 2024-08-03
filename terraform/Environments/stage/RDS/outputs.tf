@@ -1,12 +1,12 @@
 output "DB_USERNAME" {
   description = "The master username for the RDS instance"
-  value       = jsondecode(aws_secretsmanager_secret_version.rds_master_password_version.secret_string).username
+  value       = jsondecode(aws_secretsmanager_secret_version.db_secret_version.secret_string).db_username
   sensitive   = true
 }
 
 output "DB_PASSWORD" {
   description = "The master password for the RDS instance"
-  value       = jsondecode(aws_secretsmanager_secret_version.rds_master_password_version.secret_string).password
+  value       = jsondecode(aws_secretsmanager_secret_version.db_secret_version.secret_string).db_password
   sensitive   = true
 }
 
