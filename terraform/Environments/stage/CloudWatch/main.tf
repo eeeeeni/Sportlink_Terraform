@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   alarm_actions             = [aws_sns_topic.bastion_az1_topic.arn]
 
   dimensions = {
-    DBInstanceIdentifier = data.terraform_remote_state.rds.outputs.db_instance_resource_id
+    # DBInstanceIdentifier = data.terraform_remote_state.rds.outputs.db_instance_resource_id
   }
 }
 
