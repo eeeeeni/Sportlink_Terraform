@@ -10,17 +10,17 @@ data "terraform_remote_state" "redis" {
   }
 }
 
-data "terraform_remote_state" "rds" {
-  backend = "s3"
-  config = {
-    bucket         = "sportlink-terraform-backend"
-    key            = "Prod/RDS/terraform.tfstate"
-    region         = "ap-northeast-2"
-    profile        = "terraform_user"
-    dynamodb_table = "sportlink-terraform-bucket-lock"
-    encrypt        = true
-  }
-}
+# data "terraform_remote_state" "rds" {
+#   backend = "s3"
+#   config = {
+#     bucket         = "sportlink-terraform-backend"
+#     key            = "Prod/RDS/terraform.tfstate"
+#     region         = "ap-northeast-2"
+#     profile        = "terraform_user"
+#     dynamodb_table = "sportlink-terraform-bucket-lock"
+#     encrypt        = true
+#   }
+# }
 
 data "terraform_remote_state" "route53" {
   backend = "s3"

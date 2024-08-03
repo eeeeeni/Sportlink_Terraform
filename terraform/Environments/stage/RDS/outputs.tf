@@ -15,17 +15,15 @@ output "DB_HOST" {
 }
 
 output "DB_NAME" {
-  value = module.rds.db_name
+  value = module.rds.db_instance_name
 }
 
 output "db_instance_resource_id" {
-  description = "The ID of the RDS instance"
-  value       = module.rds.db_instance_resource_id
+  value = module.rds.db_instance_resource_id
 }
 
 output "DB_PORT" {
-  description = "The port on which the RDS instance is listening"
-  value       = module.rds.port
+  value = module.rds.db_instance_port
 }
 
 

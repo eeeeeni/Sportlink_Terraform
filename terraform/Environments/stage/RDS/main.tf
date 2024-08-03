@@ -34,15 +34,15 @@ data "terraform_remote_state" "vpc" {
 }
 
 # Secrets Manager 설정
-resource "aws_secretsmanager_secret" "rds_master_password" {
+resource "aws_secretsmanager_secret" "db_secret" {
   name = "sportlink-stage-rds-master-password-o"
 }
 
-resource "aws_secretsmanager_secret_version" "rds_master_password_version" {
-  secret_id     = aws_secretsmanager_secret.rds_master_password.id
+resource "aws_secretsmanager_secret_version" "db_secret_version" {
+  secret_id     = aws_secretsmanager_secret.db_secret.id
   secret_string = jsonencode({
-    username = var.DB_USERNAME
-    password = var.DB_PASSWORD
+    db_username = var.DB_USERNAME
+    db_password = var.DB_PASSWORD
   })
 }
 
@@ -116,8 +116,8 @@ module "rds" {
   ]
   major_engine_version = "5.7"
   db_name              = "stagedb"
-  username             = jsondecode(aws_secretsmanager_secret_version.rds_master_password_version.secret_string).username
-  password             = jsondecode(aws_secretsmanager_secret_version.rds_master_password_version.secret_string).password
+  username             = jsondecode(aws_secretsmanager_secret_version.db_secret_version.secret_string).db_username
+  password             = jsondecode(aws_secretsmanager_secret_version.db_secret_version.secret_string).db_password
   port                 = 3306
 
   subnet_ids             = data.terraform_remote_state.vpc.outputs.database_subnet_ids

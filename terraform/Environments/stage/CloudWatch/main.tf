@@ -113,6 +113,7 @@ resource "aws_iam_role_policy_attachment" "lambda_role_policy_attachment" {
 }
 
 # Lambda 함수 생성
+# Lambda 함수 생성
 resource "aws_lambda_function" "slack_notifier" {
   filename         = "lambda_function_payload.zip"
   function_name    = "stage_slack_notifier"
@@ -124,10 +125,11 @@ resource "aws_lambda_function" "slack_notifier" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
     }
   }
 }
+
 
 # Lambda와 SNS 주제 연결
 resource "aws_lambda_permission" "sns_invocation_az1" {
@@ -144,106 +146,6 @@ resource "aws_lambda_permission" "sns_invocation_az2" {
   function_name = aws_lambda_function.slack_notifier.function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.bastion_az2_topic.arn
-}
-
-# CloudWatch 로그 그룹 생성
-resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
-  name              = "stage-cloudtrail-log-group"
-  retention_in_days = 30
-}
-
-# S3 버킷 생성
-resource "aws_s3_bucket" "cloudtrail_bucket" {
-  bucket = "stage-cloudtrail-bucket"
-}
-
-# S3 버킷 정책 생성
-resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
-  bucket = aws_s3_bucket.cloudtrail_bucket.bucket
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid    = "CloudTrailLogs",
-        Effect = "Allow",
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        },
-        Action   = "s3:PutObject",
-        Resource = "${aws_s3_bucket.cloudtrail_bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
-      }
-    ]
-  })
-}
-
-# IAM 역할 생성
-resource "aws_iam_role" "cloudtrail_role" {
-  name = "stage-cloudtrail_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action    = "sts:AssumeRole",
-        Effect    = "Allow",
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-# IAM 정책 생성
-resource "aws_iam_policy" "cloudtrail_policy" {
-  name        = "stage_cloudtrail_policy"
-  description = "Policy for CloudTrail to write logs to CloudWatch Logs and S3"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = [
-          "logs:PutLogEvents",
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = [
-          "s3:PutObject",
-          "s3:GetBucketAcl"
-        ],
-        Resource = [
-          "${aws_s3_bucket.cloudtrail_bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
-        ]
-      }
-    ]
-  })
-}
-
-# IAM 역할과 정책 연결
-resource "aws_iam_role_policy_attachment" "cloudtrail_role_policy_attachment" {
-  role       = aws_iam_role.cloudtrail_role.name
-  policy_arn  = aws_iam_policy.cloudtrail_policy.arn
-}
-
-# CloudTrail 생성
-resource "aws_cloudtrail" "main" {
-  name                          = "stage-cloudtrail"
-  s3_bucket_name                = aws_s3_bucket.cloudtrail_bucket.bucket
-  cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.cloudtrail_log_group.arn
-  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role.arn
-  enable_logging                = true
-
-  event_selector {
-    read_write_type = "All"
-    include_management_events = true
-  }
 }
 
 # CloudWatch 알람 생성 (CPU 사용률)
@@ -288,6 +190,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high_az2" {
   }
 }
 
+# EKS Node
 resource "aws_cloudwatch_metric_alarm" "eks_node_cpu_high" {
   count = length(data.aws_instances.eks_nodes.ids)
 
@@ -309,6 +212,7 @@ resource "aws_cloudwatch_metric_alarm" "eks_node_cpu_high" {
   }
 }
 
+# RDS Instance
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   alarm_name          = "high-cpu-rds"
   comparison_operator = "GreaterThanThreshold"
@@ -327,6 +231,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
     DBInstanceIdentifier = data.terraform_remote_state.rds.outputs.db_instance_resource_id
   }
 }
+
 
 # SNS Topic Subscription for Lambda
 resource "aws_sns_topic_subscription" "lambda_subscription_az1" {
