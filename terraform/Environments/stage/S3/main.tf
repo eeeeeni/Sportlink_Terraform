@@ -91,15 +91,6 @@ resource "aws_s3_bucket_policy" "image_bucket_policy" {
   depends_on = [aws_s3_bucket.image_bucket]
 }
 
-
-output "bucket_id" {
-  value = aws_s3_bucket.image_bucket.id
-}
-
-output "bucket_arn" {
-  value = aws_s3_bucket.image_bucket.arn
-}
-
 #아래코드로 수정필요
 
 # resource "aws_s3_bucket" "image_bucket" {

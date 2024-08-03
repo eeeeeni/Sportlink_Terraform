@@ -30,10 +30,10 @@ resource "kubernetes_config_map" "app_configmap" {
   }
 
   data = {
-    redis_host = data.terraform_remote_state.redis.outputs.REDIS_HOST   # Redis 호스트 URL
-    db_host    = data.terraform_remote_state.rds.outputs.DB_HOST       # DB 호스트 URL
-    db_name    = data.terraform_remote_state.rds.outputs.DB_NAME       # DB 이름
-    s3_bucket  = data.terraform_remote_state.s3.outputs.stage_image_bucket_arn # S3 버킷 ID
+    redis_host = data.terraform_remote_state.redis.outputs.redis_host     # Redis 호스트 URL
+    db_host    = data.terraform_remote_state.rds.outputs.db_host          # DB 호스트 URL
+    db_name    = data.terraform_remote_state.rds.outputs.db_name          # DB 이름
+    s3_bucket  = data.terraform_remote_state.s3.outputs.image_bucket_arn  # S3 버킷 arn
   }
 }
 
