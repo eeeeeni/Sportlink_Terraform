@@ -1,8 +1,8 @@
-data "aws_secretsmanager_secret" "rds_master_password" {
-  name = "sportlink-stage-rds-master-password"
+data "aws_secretsmanager_secret" "db_secret" {
+  name = "sportlink-prod-rds-master-password-o"
 }
 
-data "aws_secretsmanager_secret_version" "rds_master_password_version" {
+data "aws_secretsmanager_secret_version" "db_secret_version" {
   secret_id = data.aws_secretsmanager_secret.db_password.id
 }
 

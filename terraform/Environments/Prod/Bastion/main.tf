@@ -190,8 +190,3 @@ resource "aws_instance" "BastionHost_AZ2" {
 
   depends_on = [data.terraform_remote_state.eks]
 }
-
-output "bastion_host_sg_id" {
-  description = "The ID of the Bastion Host Security Group"
-  value       = module.BastionHost_SG.security_group_id
-}

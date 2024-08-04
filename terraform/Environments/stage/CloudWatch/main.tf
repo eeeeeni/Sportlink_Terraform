@@ -136,7 +136,7 @@ resource "aws_lambda_function" "slack_notifier" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
       BUCKET_NAME        = aws_s3_bucket.cloudwatch_logs_bucket.bucket
     }
   }
@@ -296,7 +296,7 @@ resource "aws_s3_bucket_policy" "cloudwatch_logs_policy" {
 # CloudWatch Logs Subscription Filter 생성
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_logs_to_s3" {
   name            = "cloudwatch-logs-to-s3"
-  log_group_name  = aws_cloudwatch_log_group.example_log_group.name
+  log_group_name  = aws_cloudwatch_log_group.stage_log_group.name
   filter_pattern  = ""
   destination_arn = aws_lambda_function.slack_notifier.arn
 
@@ -311,5 +311,5 @@ resource "aws_lambda_permission" "cloudwatch_logs_to_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.slack_notifier.function_name
   principal     = "logs.amazonaws.com"
-  source_arn    = "arn:aws:logs:ap-northeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/your-log-group:*"
+  source_arn    = "arn:aws:logs:ap-northeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/stage-watch-log-group:*"
 }
