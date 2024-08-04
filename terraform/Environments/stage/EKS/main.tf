@@ -98,14 +98,14 @@ resource "aws_ec2_tag" "public_subnet_tag" {
   value       = "1"
 }
 
-# resource "kubernetes_namespace" "stage_namespace" {
-#   metadata {
-#     name = "stage"  # 생성할 네임스페이스 이름
-#     labels = {
-#       env = "stage"
-#     }
-#   }
-# }
+resource "kubernetes_namespace" "stage_namespace" {
+  metadata {
+    name = "stage"  # 생성할 네임스페이스 이름
+    labels = {
+      env = "stage"
+    }
+  }
+}
 
 
 # # # --------------------------------------------------------------------------------
@@ -218,15 +218,15 @@ resource "aws_iam_role_policy_attachment" "externalDNS_policy_attachment" {
 # # # 3. AWSLoadBalancerController Install (Helm Install)
 
 # # # Service Account for AWS Load Balancer Controller
-# # resource "kubernetes_service_account" "alb_controller_sa" {
-# #   metadata {
-# #     name      = "aws-load-balancer-controller"
-# #     namespace = "kube-system"
-# #     annotations = {
-# #       "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller_role.arn
-# #     }
-# #   }
-# # }
+# resource "kubernetes_service_account" "alb_controller_sa" {
+#   metadata {
+#     name      = "aws-load-balancer-controller"
+#     namespace = "kube-system"
+#     annotations = {
+#       "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller_role.arn
+#     }
+#   }
+# }
 
 # # # Helm Release for AWS Load Balancer Controller
 # # resource "helm_release" "lb_controller" {

@@ -90,7 +90,8 @@ resource "aws_iam_policy" "lambda_policy" {
         Action   = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "logs:FilterLogEvents"
         ],
         Resource = "*"
       },
@@ -101,10 +102,21 @@ resource "aws_iam_policy" "lambda_policy" {
           aws_sns_topic.bastion_az1_topic.arn,
           aws_sns_topic.bastion_az2_topic.arn
         ]
+      },
+      {
+        Effect   = "Allow",
+        Action   = "s3:PutObject",
+        Resource = "${aws_s3_bucket.cloudwatch_logs_bucket.arn}/*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = "logs:PutSubscriptionFilter",
+        Resource = "*"
       }
     ]
   })
 }
+
 
 # Lambda 역할과 정책 연결
 resource "aws_iam_role_policy_attachment" "lambda_role_policy_attachment" {
@@ -112,7 +124,6 @@ resource "aws_iam_role_policy_attachment" "lambda_role_policy_attachment" {
   policy_arn  = aws_iam_policy.lambda_policy.arn
 }
 
-# Lambda 함수 생성
 # Lambda 함수 생성
 resource "aws_lambda_function" "slack_notifier" {
   filename         = "lambda_function_payload.zip"
@@ -125,11 +136,11 @@ resource "aws_lambda_function" "slack_notifier" {
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+      BUCKET_NAME        = aws_s3_bucket.cloudwatch_logs_bucket.bucket
     }
   }
 }
-
 
 # Lambda와 SNS 주제 연결
 resource "aws_lambda_permission" "sns_invocation_az1" {
@@ -232,7 +243,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   }
 }
 
-
 # SNS Topic Subscription for Lambda
 resource "aws_sns_topic_subscription" "lambda_subscription_az1" {
   topic_arn = aws_sns_topic.bastion_az1_topic.arn
@@ -244,4 +254,62 @@ resource "aws_sns_topic_subscription" "lambda_subscription_az2" {
   topic_arn = aws_sns_topic.bastion_az2_topic.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.slack_notifier.arn
+}
+
+# S3 버킷 생성
+resource "aws_s3_bucket" "cloudwatch_logs_bucket" {
+  bucket        = "stage-cloudwatch-logs-bucket"
+  force_destroy = true
+}
+
+resource "aws_cloudwatch_log_group" "stage_log_group" {
+  name = "/aws/lambda/stage-watch-log-group"  
+}
+
+
+# S3 버킷 정책 생성
+data "aws_iam_policy_document" "cloudwatch_logs_policy" {
+  statement {
+    sid    = "CloudWatchLogsToS3"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logs.amazonaws.com"]
+    }
+
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.cloudwatch_logs_bucket.arn}/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:logs:ap-northeast-2:${data.aws_caller_identity.current.account_id}:log-group:*"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudwatch_logs_policy" {
+  bucket = aws_s3_bucket.cloudwatch_logs_bucket.id
+  policy = data.aws_iam_policy_document.cloudwatch_logs_policy.json
+}
+
+# CloudWatch Logs Subscription Filter 생성
+resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_logs_to_s3" {
+  name            = "cloudwatch-logs-to-s3"
+  log_group_name  = aws_cloudwatch_log_group.example_log_group.name
+  filter_pattern  = ""
+  destination_arn = aws_lambda_function.slack_notifier.arn
+
+  depends_on = [
+    aws_lambda_permission.cloudwatch_logs_to_lambda
+  ]
+}
+
+
+resource "aws_lambda_permission" "cloudwatch_logs_to_lambda" {
+  statement_id  = "AllowExecutionFromCloudWatchLogs"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.slack_notifier.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:ap-northeast-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/your-log-group:*"
 }

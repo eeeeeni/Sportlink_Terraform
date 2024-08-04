@@ -30,6 +30,9 @@ def lambda_handler(event, context):
     
     # Extract relevant information from the event
     try:
+        if 'Records' not in event or len(event['Records']) == 0:
+            raise KeyError('Event does not contain "Records" key or it is empty')
+
         sns_message = json.loads(event['Records'][0]['Sns']['Message'])
         alarm_name = sns_message.get('AlarmName', '알람 이름 없음')
         instance_id = sns_message.get('Trigger', {}).get('Dimensions', [{}])[0].get('value', '알 수 없는 인스턴스')
