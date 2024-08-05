@@ -26,8 +26,8 @@ resource "kubernetes_secret" "app_secret" {
   }
 
   data = {
-    db_username = base64encode(jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["db_username"])
-    db_password = base64encode(jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["db_password"])
+    db_username = (jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["db_username"])
+    db_password = (jsondecode(data.aws_secretsmanager_secret_version.db_secret_version.secret_string)["db_password"])
   }
 }
 
