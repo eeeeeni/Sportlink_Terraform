@@ -36,7 +36,7 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "rds_master_password" {
-  name = "dev-rds-secret-password-1"
+  name = "dev-rds-secret-password-newonelast"
 }
 
 resource "aws_secretsmanager_secret_version" "rds_master_password_version" {

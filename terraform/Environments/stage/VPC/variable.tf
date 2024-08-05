@@ -14,3 +14,4 @@ locals {
 
   elasticache_subnet_group_name = "stage-vpc-elasticache" 
 }
+

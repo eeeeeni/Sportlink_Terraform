@@ -1,6 +1,6 @@
 
 data "aws_secretsmanager_secret" "db_secret" {
-  name = "sportlink-stage-rds-master-password-oo"
+  name = "sportlink-stage-rds-master-password-newonelast"
 }
 
 data "aws_secretsmanager_secret_version" "db_secret_version" {

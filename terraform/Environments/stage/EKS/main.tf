@@ -33,12 +33,12 @@ data "terraform_remote_state" "vpc" {
 
 data "aws_eks_cluster" "cluster" {
   name       = module.eks.cluster_name
-  depends_on = [module.eks]
+  # depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "cluster" {
   name       = module.eks.cluster_name
-  depends_on = [module.eks]
+  # depends_on = [module.eks]
 }
 
 data "aws_caller_identity" "current" {}
@@ -51,7 +51,13 @@ provider "kubernetes" {
   
 }
 
-
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    token                  = data.aws_eks_cluster_auth.cluster.token
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  }
+}
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -213,89 +219,89 @@ resource "aws_iam_role_policy_attachment" "externalDNS_policy_attachment" {
 }
 
 
-# # # --------------------------------------------------------------------------------
+# # --------------------------------------------------------------------------------
 
-# # # 3. AWSLoadBalancerController Install (Helm Install)
+# # 3. AWSLoadBalancerController Install (Helm Install)
 
-# # # Service Account for AWS Load Balancer Controller
-# resource "kubernetes_service_account" "alb_controller_sa" {
-#   metadata {
-#     name      = "aws-load-balancer-controller"
-#     namespace = "kube-system"
-#     annotations = {
-#       "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller_role.arn
-#     }
-#   }
-# }
+# # Service Account for AWS Load Balancer Controller
+resource "kubernetes_service_account" "alb_controller_sa" {
+  metadata {
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller_role.arn
+    }
+  }
+}
 
-# # # Helm Release for AWS Load Balancer Controller
-# # resource "helm_release" "lb_controller" {
-# #   name       = "aws-load-balancer-controller"
-# #   repository = "https://aws.github.io/eks-charts"
-# #   chart      = "aws-load-balancer-controller"
-# #   namespace  = "kube-system"
+# Helm Release for AWS Load Balancer Controller
+resource "helm_release" "lb_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
 
-# #   values = [
-# #     <<EOF
-# #     serviceAccount:
-# #       create: false
-# #       name: aws-load-balancer-controller
-# #     clusterName: ${module.eks.cluster_name}
-# #     region: ${data.aws_region.current.name}
-# #     vpcId: ${data.terraform_remote_state.vpc.outputs.vpc_id}
-# #     EOF
-# #   ]
-# # }
+  values = [
+    <<EOF
+    serviceAccount:
+      create: false
+      name: aws-load-balancer-controller
+    clusterName: ${module.eks.cluster_name}
+    region: ${data.aws_region.current.name}
+    vpcId: ${data.terraform_remote_state.vpc.outputs.vpc_id}
+    EOF
+  ]
+}
 
 
-# # # 3. ExternalDNS Install ( Helm Install )
+# 3. ExternalDNS Install ( Helm Install )
 
-# # # Kubernetes Service Account for ExternalDNS
-# # resource "kubernetes_service_account" "externalDNS_sa" {
-# #   metadata {
-# #     name      = "external-dns"
-# #     namespace = "kube-system"
-# #     annotations = {
-# #       "eks.amazonaws.com/role-arn" = aws_iam_role.externalDNS_role.arn
-# #     }
-# #   }
-# # }
+# Kubernetes Service Account for ExternalDNS
+resource "kubernetes_service_account" "externalDNS_sa" {
+  metadata {
+    name      = "external-dns"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.externalDNS_role.arn
+    }
+  }
+}
 
-# # # Helm Release for ExternalDNS
-# # resource "helm_release" "external_dns" {
-# #   name       = "external-dns"
-# #   repository = "https://charts.bitnami.com/bitnami"
-# #   chart      = "external-dns"
-# #   namespace  = "kube-system"
+# Helm Release for ExternalDNS
+resource "helm_release" "external_dns" {
+  name       = "external-dns"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "external-dns"
+  namespace  = "kube-system"
 
-# #   # Set을 활용한 Values.yml 정의
-# #   set {
-# #     name  = "serviceAccount.create"
-# #     value = "false"
-# #   }
-# #   set {
-# #     name  = "serviceAccount.name"
-# #     value = "external-dns"
-# #   }
-# #   set {
-# #     name  = "provider"
-# #     value = "aws"
-# #   }
-# #   set {
-# #     name  = "aws.region"
-# #     value = "ap-northeast-2"
-# #   }
-# #   set {
-# #     name  = "domainFilters[0]"
-# #     value = "mydevsecops.link"
-# #   }
-# #   set {
-# #     name  = "policy"
-# #     value = "sync"
-# #   }
-# #   set {
-# #     name  = "rbac.create"
-# #     value = "true"
-# #   }
-# # }
+  # Set을 활용한 Values.yml 정의
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+  set {
+    name  = "serviceAccount.name"
+    value = "external-dns"
+  }
+  set {
+    name  = "provider"
+    value = "aws"
+  }
+  set {
+    name  = "aws.region"
+    value = "ap-northeast-2"
+  }
+  set {
+    name  = "domainFilters[0]"
+    value = "eeeni.store"
+  }
+  set {
+    name  = "policy"
+    value = "sync"
+  }
+  set {
+    name  = "rbac.create"
+    value = "true"
+  }
+}
 
