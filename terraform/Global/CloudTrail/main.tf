@@ -96,12 +96,12 @@ resource "aws_lambda_function" "send_slack_notification" {
   filename         = "./lambda_function_payload.zip"  # ZIP 파일에 Lambda 함수 코드가 포함되어 있어야 함
   function_name    = "send_slack_notification"
   role             = aws_iam_role.lambda_role_unique.arn
-  handler          = "index.handler"
-  runtime          = "nodejs20.x"  # 또는 다른 런타임을 선택
+  handler          = "index.lambda_handler"
+  runtime          = "python3.9"  # 또는 다른 런타임을 선택
 
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"  # 슬랙 웹훅 URL
+      SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"  # 슬랙 웹훅 URL
     }
   }
 }
