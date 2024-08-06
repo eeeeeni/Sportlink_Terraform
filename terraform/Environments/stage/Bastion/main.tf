@@ -67,6 +67,13 @@ module "BastionHost_SG" {
       description = "ICMP Allow"
       cidr_blocks = "0.0.0.0/0"
     }
+    # {
+    #   from_port   = 1194
+    #   to_port     = 1194
+    #   protocol    = "udp"
+    #   description = "vpn Allow"
+    #   cidr_blocks = "0.0.0.0/0"
+    # }
   ]
   egress_with_cidr_blocks = [
     {

@@ -27,3 +27,13 @@ output "private_subnets" {
   description = "The private subnets CIDR blocks"
   value       = module.stage_vpc.private_subnets_cidr_blocks
 }
+
+output "vpc_cidr_block" {
+  description = "The CIDR block of the VPC"
+  value       = module.stage_vpc.vpc_cidr_block
+}
+
+output "public_subnets" {
+  description = "The public subnets CIDR blocks"
+  value       = module.stage_vpc.public_subnets_cidr_blocks
+}

@@ -102,7 +102,7 @@ resource "aws_elasticache_subnet_group" "redis_subnet_group" {
 
 # ElastiCache Redis 클러스터 설정
 module "elasticache_redis" {
-  source = "terraform-aws-modules/elasticache/aws"
+  source = "github.com/eeeeeni/Terraform-project-Elasticache"
   version = "~> 1.2.0"
 
   replication_group_id = "prod-redis-group"

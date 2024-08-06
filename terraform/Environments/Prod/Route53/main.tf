@@ -64,4 +64,20 @@ resource "aws_acm_certificate_validation" "sportlink_store" {
 }
 
 
+# # Argo CD 관리용 도메인
+# resource "aws_route53_record" "argocd_sportlink_store" {
+#   zone_id = aws_route53_zone.sportlink_store.zone_id
+#   name    = "argocd.sportlink.store"
+#   type    = "CNAME"
+#   ttl     = 60
+#   records = ["aad4050f9e31d49b981d4ff5e6d38b34.example.com"] # 실제 CNAME 값으로 대체
+# }
 
+# # Grafana 관리용 도메인
+# resource "aws_route53_record" "grafana_sportlink_store" {
+#   zone_id = aws_route53_zone.sportlink_store.zone_id
+#   name    = "grafana.sportlink.store"
+#   type    = "A"
+#   ttl     = 60
+#   records = ["13.124.204.74"]
+# }
