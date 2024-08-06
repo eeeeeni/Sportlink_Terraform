@@ -118,110 +118,110 @@ resource "kubernetes_namespace" "prod_namespace" {
 
 # # # --------------------------------------------------------------------------------
 
-# S3 접근 정책을 JSON 파일에서 가져와 정의
-data "local_file" "s3_access_policy_json" {
-  filename = "${path.module}/iam_policy/s3_access_policy.json"
-}
+# # S3 접근 정책을 JSON 파일에서 가져와 정의
+# data "local_file" "s3_access_policy_json" {
+#   filename = "${path.module}/iam_policy/s3_access_policy.json"
+# }
 
-resource "aws_iam_policy" "s3_access_policy" {
-  name        = "s3_access_policy_prod"
-  description = "Policy to allow EKS to access the S3 bucket in Prod environment"
-  policy      = data.local_file.s3_access_policy_json.content
-}
+# resource "aws_iam_policy" "s3_access_policy" {
+#   name        = "s3_access_policy_prod"
+#   description = "Policy to allow EKS to access the S3 bucket in Prod environment"
+#   policy      = data.local_file.s3_access_policy_json.content
+# }
 
-# EKS가 S3에 접근하기 위한 IAM 역할 정의
-data "local_file" "s3_access_role_json" {
-  filename = "${path.module}/iam_role/s3_access_role.json"
-}
+# # EKS가 S3에 접근하기 위한 IAM 역할 정의
+# data "local_file" "s3_access_role_json" {
+#   filename = "${path.module}/iam_role/s3_access_role.json"
+# }
 
-resource "aws_iam_role" "eks_s3_access_role" {
-  name               = "eks_s3_access_role_prod"
-  assume_role_policy = data.local_file.s3_access_role_json.content
-}
+# resource "aws_iam_role" "eks_s3_access_role" {
+#   name               = "eks_s3_access_role_prod"
+#   assume_role_policy = data.local_file.s3_access_role_json.content
+# }
 
-# 정의된 역할에 정책을 연결
-resource "aws_iam_role_policy_attachment" "eks_s3_access_role_attachment" {
-  role       = aws_iam_role.eks_s3_access_role.name
-  policy_arn = aws_iam_policy.s3_access_policy.arn
-}
-
-
-# # --------------------------------------------------------------------------------
-
-# # AWS Load Balancer Controller IRSA Configuration
-
-# 1. AWSLoadBalancerController Policy Create
-
-data "local_file" "alb_controller_policy_json" {
-  filename = "${path.module}/iam_policy/AWSLoadBalancerControllerPolicy.json"
-}
-
-resource "aws_iam_policy" "alb_controller_policy" {
-  name        = "AWSLoadBalancerControllerPolicy"
-  description = "Policy to allow access to AWSLoadBalancerController"
-  policy      = data.local_file.alb_controller_policy_json.content
-}
-
-# 2. AWSLoadBalancerController Role Create & Trust relationship / Policy Attachment 
-
-data "template_file" "alb_controller_role_json" {
-  template = file("${path.module}/iam_role/AWSLoadBalancerControllerAssumeRole.json")
-  vars = {
-    account_id = data.aws_caller_identity.current.account_id
-    region     = data.aws_region.current.name
-    cluster_id = regex(".*id/(.+)$", data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer)[0]
-  }
-}
-
-resource "aws_iam_role" "alb_controller_role" {
-  name               = "AWSLoadBalancerControllerRole"
-  assume_role_policy = data.template_file.alb_controller_role_json.rendered
-}
-
-resource "aws_iam_role_policy_attachment" "alb_controller_policy_attachment" {
-  policy_arn = aws_iam_policy.alb_controller_policy.arn
-  role       = aws_iam_role.alb_controller_role.name
-}
+# # 정의된 역할에 정책을 연결
+# resource "aws_iam_role_policy_attachment" "eks_s3_access_role_attachment" {
+#   role       = aws_iam_role.eks_s3_access_role.name
+#   policy_arn = aws_iam_policy.s3_access_policy.arn
+# }
 
 
-# Route53(ExternalDNS) IRSA Configuration
+# # # --------------------------------------------------------------------------------
 
-# 1. ExternalDNS Policy Create
+# # # AWS Load Balancer Controller IRSA Configuration
 
-data "local_file" "externalDNS_policy_json" {
-  filename = "${path.module}/iam_policy/ExternalDNSPolicy.json"
-}
+# # 1. AWSLoadBalancerController Policy Create
 
-resource "aws_iam_policy" "externalDNS_policy" {
-  name        = "ExternalDNSRoute53AccessPolicy"
-  description = "Policy to allow access to Route53 Hosting Area"
-  policy = data.local_file.externalDNS_policy_json.content
-}
+# data "local_file" "alb_controller_policy_json" {
+#   filename = "${path.module}/iam_policy/AWSLoadBalancerControllerPolicy.json"
+# }
+
+# resource "aws_iam_policy" "alb_controller_policy" {
+#   name        = "AWSLoadBalancerControllerPolicy"
+#   description = "Policy to allow access to AWSLoadBalancerController"
+#   policy      = data.local_file.alb_controller_policy_json.content
+# }
+
+# # 2. AWSLoadBalancerController Role Create & Trust relationship / Policy Attachment 
+
+# data "template_file" "alb_controller_role_json" {
+#   template = file("${path.module}/iam_role/AWSLoadBalancerControllerAssumeRole.json")
+#   vars = {
+#     account_id = data.aws_caller_identity.current.account_id
+#     region     = data.aws_region.current.name
+#     cluster_id = regex(".*id/(.+)$", data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer)[0]
+#   }
+# }
+
+# resource "aws_iam_role" "alb_controller_role" {
+#   name               = "AWSLoadBalancerControllerRole"
+#   assume_role_policy = data.template_file.alb_controller_role_json.rendered
+# }
+
+# resource "aws_iam_role_policy_attachment" "alb_controller_policy_attachment" {
+#   policy_arn = aws_iam_policy.alb_controller_policy.arn
+#   role       = aws_iam_role.alb_controller_role.name
+# }
 
 
-# 2. ExternalDNS Role Create & Trust relationship / Policy Attachment 
+# # Route53(ExternalDNS) IRSA Configuration
 
-data "template_file" "externalDNS_role_json" {
-  template = file("${path.module}/iam_role/ExternalDNSAssumeRole.json")
-  vars = {
-    account_id = data.aws_caller_identity.current.account_id
-    region     = data.aws_region.current.name
-    cluster_id = regex(".*id/(.+)$", data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer)[0]
-  }
-}
+# # 1. ExternalDNS Policy Create
 
-resource "aws_iam_role" "externalDNS_role" {
-  name = "ExternalDNSRole"
-  assume_role_policy = data.template_file.externalDNS_role_json.rendered
-}
+# data "local_file" "externalDNS_policy_json" {
+#   filename = "${path.module}/iam_policy/ExternalDNSPolicy.json"
+# }
 
-resource "aws_iam_role_policy_attachment" "externalDNS_policy_attachment" {
-  policy_arn = aws_iam_policy.externalDNS_policy.arn
-  role       = aws_iam_role.externalDNS_role.name
-}
+# resource "aws_iam_policy" "externalDNS_policy" {
+#   name        = "ExternalDNSRoute53AccessPolicy"
+#   description = "Policy to allow access to Route53 Hosting Area"
+#   policy = data.local_file.externalDNS_policy_json.content
+# }
 
 
-# # # # --------------------------------------------------------------------------------
+# # 2. ExternalDNS Role Create & Trust relationship / Policy Attachment 
+
+# data "template_file" "externalDNS_role_json" {
+#   template = file("${path.module}/iam_role/ExternalDNSAssumeRole.json")
+#   vars = {
+#     account_id = data.aws_caller_identity.current.account_id
+#     region     = data.aws_region.current.name
+#     cluster_id = regex(".*id/(.+)$", data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer)[0]
+#   }
+# }
+
+# resource "aws_iam_role" "externalDNS_role" {
+#   name = "ExternalDNSRole"
+#   assume_role_policy = data.template_file.externalDNS_role_json.rendered
+# }
+
+# resource "aws_iam_role_policy_attachment" "externalDNS_policy_attachment" {
+#   policy_arn = aws_iam_policy.externalDNS_policy.arn
+#   role       = aws_iam_role.externalDNS_role.name
+# }
+
+
+# # # # # --------------------------------------------------------------------------------
 
 # # 3. ExternalDNS Install ( Helm Install )
 

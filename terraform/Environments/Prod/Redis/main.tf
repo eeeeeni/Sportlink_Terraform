@@ -67,7 +67,7 @@ resource "aws_security_group" "redis_sg" {
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
-    cidr_blocks = ["172.16.21.0/24"]
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.private_subnets[0]]
   }
 
   ingress {
@@ -75,7 +75,7 @@ resource "aws_security_group" "redis_sg" {
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
-    cidr_blocks = ["172.16.22.0/24"]
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.private_subnets[1]]
   }
 
   egress {
@@ -103,7 +103,7 @@ resource "aws_elasticache_subnet_group" "redis_subnet_group" {
 # ElastiCache Redis 클러스터 설정
 module "elasticache_redis" {
   source = "github.com/eeeeeni/Terraform-project-Elasticache"
-  version = "~> 1.2.0"
+  # version = "~> 1.2.0"
 
   replication_group_id = "prod-redis-group"
   engine = "redis"

@@ -35,7 +35,7 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "sportlink-prod-rds-master-password-o"
+  name = "sportlink-prod-rds-name-password"
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_version" {
@@ -48,8 +48,7 @@ resource "aws_secretsmanager_secret_version" "db_secret_version" {
 
 # RDS SG
 module "RDS_SG" {
-  source          = "terraform-aws-modules/security-group/aws"
-  version         = "5.1.0"
+  source          = "github.com/eeeeeni/Terraform-project-SG"
   name            = "prod-rds-sg"
   description     = "DB Port Allow"
   vpc_id          = data.terraform_remote_state.vpc.outputs.vpc_id
@@ -92,8 +91,7 @@ resource "aws_db_subnet_group" "default" {
 }
 
 module "rds" {
-  source                              = "terraform-aws-modules/rds/aws"
-  version                             = "6.1.1"
+  source                              = "github.com/eeeeeni/Terraform-project-RDS"
   identifier                          = "prod-rds"
   engine                              = "mysql"
   engine_version                      = "5.7"

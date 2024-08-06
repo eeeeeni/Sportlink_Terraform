@@ -64,7 +64,7 @@ module "SSH_SG" {
       cidr_blocks = local.all_network
     },
     {
-      from_port   = -1 # ICMP에는 포트 번호가 필요 없음
+      from_port   = -1 
       to_port     = -1
       protocol    = local.icmp_protocol
       description = "ICMP Allow"

@@ -69,7 +69,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_endpoint" {
   description            = "Client VPN for EKS access"
   server_certificate_arn = data.aws_acm_certificate.server.arn
   client_cidr_block      = "10.100.0.0/22"
-  vpc_id                 = data.terraform_remote_state.vpc.outputs.vpc_id  # VPC ID 추가
+  vpc_id                 = data.terraform_remote_state.vpc.outputs.vpc_id  
   security_group_ids     = [aws_security_group.vpn_secgroup.id]
   split_tunnel           = true
 
@@ -86,7 +86,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_endpoint" {
 # 네트워크 연결 설정
 resource "aws_ec2_client_vpn_network_association" "vpn_association" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_endpoint.id
-  subnet_id              = tolist(data.terraform_remote_state.vpc.outputs.public_subnet_ids)[0]  # 서브넷 ID를 올바르게 참조
+  subnet_id              = tolist(data.terraform_remote_state.vpc.outputs.public_subnet_ids)[0]  
 }
 
 # 인증 규칙 설정
