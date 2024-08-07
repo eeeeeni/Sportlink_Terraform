@@ -97,7 +97,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 }
 
 module "rds" {
-  source                              = "terraform-aws-modules/rds/aws"
+  source                              = "github.com/choijongun/Terraform_Project_RDS"
   version                             = "6.1.1"
   identifier                          = "dev-rds"
   engine                              = "mysql"

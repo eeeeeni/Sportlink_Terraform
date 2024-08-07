@@ -59,7 +59,7 @@ resource "aws_security_group" "redis_sg" {
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
-    security_groups = [data.terraform_remote_state.bastion.outputs.bastion_host_sg_id]
+    security_groups = [data.terraform_remote_state.bastion.outputs.BastionHost_SG_id]
   }
 
   ingress {

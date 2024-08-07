@@ -35,7 +35,7 @@ data "terraform_remote_state" "vpc" {
 
 # Secrets Manager 설정
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "sportlink-prod-rds-name-password"
+  name = "sportlink-prod-rds-name-and-password"
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_version" {
