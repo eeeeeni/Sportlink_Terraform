@@ -76,11 +76,33 @@ resource "aws_instance" "grafana" {
   }
 
   user_data = <<-EOF
+              #!/bin/bash
+
+              # 시스템 패키지 업데이트
               sudo yum update -y
-              sudo tee /etc/yum.repos.d/grafana.repo
+              
+              # Grafana 저장소 파일 생성
+              sudo tee /etc/yum.repos.d/grafana.repo <<- 'EOF'
+              [grafana]
+              name=Grafana
+              baseurl=https://packages.grafana.com/oss/rpm
+              repo_gpgcheck=1
+              enabled=1
+              gpgkey=https://packages.grafana.com/gpg.key
+              gpgcheck=1
+              EOF
+              
+              # Grafana 패키지 설치
               sudo yum install grafana -y
+              
+              # Grafana 서버 시작
               sudo systemctl start grafana-server
+              
+              # Grafana 서버 부팅 시 자동 시작 설정
               sudo systemctl enable grafana-server
+              
+              # 설치 및 시작 완료 메시지 출력
               echo "Grafana has been installed and started successfully."
+
               EOF
 }
